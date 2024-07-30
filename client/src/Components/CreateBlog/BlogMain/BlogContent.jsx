@@ -9,6 +9,7 @@ const BlogContent = () => {
   const card = cards.find(card => card.id === parseInt(id, 10)); // Find the specific card by ID
   const [blogContent, setBlogContent] = useState({});
   const [date, setDate]= useState('');
+  const [latestBlogs,setLatestBlogs]= useState([]);
   const fetchPost = async () => {
     try {
       const response = await axios.get(`${apiUrl}/posts/${id}`);
@@ -26,6 +27,18 @@ const BlogContent = () => {
       console.error('Error fetching post:', error);
     } 
   };
+
+  const fetchLatestBlogs =async (event) => {
+    try {
+      const response = await axios.get(`${apiUrl}/posts/latest/`);
+      setLatestBlogs(response.data);
+    } catch (error) {
+      console.error('Error:', error);
+    }
+  };
+  useEffect(() => { 
+    fetchLatestBlogs();  
+  }, []);
 
   useEffect(() => {
     fetchPost();
@@ -53,11 +66,11 @@ const BlogContent = () => {
       <div className='sidebar'>
         <h3>Latest Reads</h3>
         <ul>
-          {cards.map(card => (
-            <li key={card.id}>
-              <a href={card.link}>{card.title}</a>
+          {latestBlogs && latestBlogs.map((blog,index) => (
+            <li key={blog._id}>
+              <Link to={`/BlogPage/${blog._id}`}>{blog.title}</Link>
               <p>
-                <Link to={card.link}>Read More<span><i className="fa-solid fa-arrow-right"></i></span></Link>
+                <Link to={`/BlogPage/${blog._id}`}>Read More<span><i className="fa-solid fa-arrow-right"></i></span></Link>
               </p>
             </li>
           ))}
